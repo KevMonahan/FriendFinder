@@ -13,15 +13,51 @@
 </head>
 
 <body>
-<h2>Gaming Survey Questions</h2>
+    <container>
+        <h2>Gaming Survey Questions</h2>
 
-<hr>
-<h3>Tell Us About Yourself</h3>
-<h4>Name (Required)</h4>
-<input type="text" id="name" class="form-control" required>
-<h4>Link to an Image (Required)</h4>
-<input type="text" id="picture" class="form-control" required>
-<hr>
+        <hr>
+        <h3>Tell Us About Yourself</h3>
+        <h4>Name (Required)</h4>
+        <input type="text" id="name" class="form-control" required>
+        <h4>Link to an Image (Required)</h4>
+        <input type="text" id="picture" class="form-control" required>
+        <hr>
+
+        <div id="survey">
+
+        </div>
+        <hr>
+        <button type="submit">Find Your Match!</button>
+    </container>
+    <script>
+        var questions = [
+            "Generally you enjoy shooter games", "It's enjoyable to you to play horror games", "Your favorite games to play tend to fall in the MOBA category",
+            "Nothing excites you more than to grind away on an MMORPG", "You enjoy being the tank in team games", "You enjoy taking on the role of the healer",
+            "You enjoy being the main source of Damage in a game, AKA the DPSer", "You like to hang back and play mages", "Do you tend to rage quit when a game is going badly?",
+            "You blame your mistakes on lag, the game, and your teammates"
+        ]
+        var questionsDiv = $("<div>");
+            questionsDiv.attr("id", "questions")
+        for (i = 0; i < questions.length; i++) {
+            var questionDiv = $("<div>");
+            var questionSelect = $("<select>");
+
+            questionSelect.append(`<option value="1">1 (Strongly Disagree)</option>`);
+            questionSelect.append(`<option value="2">2</option>`);
+            questionSelect.append(`<option value="3">3</option>`);
+            questionSelect.append(`<option value="4">4</option>`);
+            questionSelect.append(`<option value="5">5 (Strongly Agree)</option>`);
+
+                questionDiv.attr("id", "question"+i)
+                questionDiv.append(`<h4>${questions[i]}</h4>`);
+                questionDiv.append(questionSelect);
+                questionsDiv.append(questionDiv);
+        }
+
+        $("#survey").append(questionsDiv);
+
+    </script>
 </body>
 
 </html>
