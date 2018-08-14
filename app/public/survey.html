@@ -9,18 +9,19 @@
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css">
     <script src="https://code.jquery.com/jquery.js"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
+    <link rel="stylesheet" type="text/css" src="styles.css">
 
 </head>
 
-<body>
-    <container>
-        <h2>Gaming Survey Questions</h2>
+<body background="https://images.duckduckgo.com/iu/?u=https%3A%2F%2Fthebulldogestate.files.wordpress.com%2F2011%2F02%2Fgff0.png&f=1" style="background-size: 100% 100%">
+    <container class="container col-md-12" style="text-align: center">
+        <h2 style="color: purple">Gaming Survey Questions</h2>
 
         <hr>
-        <h3>Tell Us About Yourself</h3>
-        <h4>Name (Required)</h4>
+        <h3 style="color: green">Tell Us About Yourself</h3>
+        <h4 style="color: green">Name (Required)</h4>
         <input type="text" id="name" class="form-control" required>
-        <h4>Link to an Image (Required)</h4>
+        <h4 style="color: green">Link to an Image (Required)</h4>
         <input type="text" id="picture" class="form-control" required>
         <hr>
 
@@ -28,8 +29,42 @@
 
         </div>
         <hr>
-        <button type="submit">Find Your Match!</button>
+        <button type="submit" class="btn btn-danger" id="submit">Find Your Match!</button>
+
+        <footer class="footer">
+            <div class="container">
+                <p>
+                    <a href="/api/friends">Friends List API</a> |
+                    <a href="https://github.com/kevmonahan/FriendFinder">GitHub Repository</a>
+                </p>
+            </div>
+        </footer>
+
+        <div id="results-modal" class="modal fade" role="dialog">
+            <div class="modal-dialog">
+        
+              <!-- Modal content-->
+              <div class="modal-content">
+                <div class="modal-header">
+                  <button class="close" data-dismiss="modal">&times;</button>
+                  <h2 class="modal-title"><strong>Best Gamer Friend</strong></h2>
+                </div>
+                <div class="modal-body">
+                  <h2 id="match-name"></h2>
+                  <img style="width: 80%" id="match-img" src="https://scontent-ort2-1.xx.fbcdn.net/v/t1.0-9/29513247_10210884790499692_1014854222623398177_n.jpg?_nc_cat=0&oh=a0c3c0cf8c2baa837c80e5367b15f005&oe=5C024F65" alt="">
+                </div>
+                <div class="modal-footer">
+                  <button class="btn btn-default" data-dismiss="modal">Close</button>
+                </div>
+              </div>
+        
+            </div>
+          </div>
+
+
     </container>
+
+
     <script>
         var questions = [
             "Generally you enjoy shooter games", "It's enjoyable to you to play horror games", "Your favorite games to play tend to fall in the MOBA category",
@@ -38,25 +73,107 @@
             "You blame your mistakes on lag, the game, and your teammates"
         ]
         var questionsDiv = $("<div>");
-            questionsDiv.attr("id", "questions")
+        questionsDiv.attr("id", "questions")
         for (i = 0; i < questions.length; i++) {
             var questionDiv = $("<div>");
             var questionSelect = $("<select>");
-
+            questionSelect.attr("class", "chosen-select");
+            questionSelect.attr("id", "question" + i);
             questionSelect.append(`<option value="1">1 (Strongly Disagree)</option>`);
             questionSelect.append(`<option value="2">2</option>`);
             questionSelect.append(`<option value="3">3</option>`);
             questionSelect.append(`<option value="4">4</option>`);
             questionSelect.append(`<option value="5">5 (Strongly Agree)</option>`);
 
-                questionDiv.attr("id", "question"+i)
-                questionDiv.append(`<h4>${questions[i]}</h4>`);
-                questionDiv.append(questionSelect);
-                questionsDiv.append(questionDiv);
+            questionDiv.attr("id", "question-slot-" + i);
+            questionDiv.append(`<h2 style="color: red; background-color: rgba(0, 0, 0, 0.5);
+    background-clip: border-box"><b>${questions[i]}</b></h2>`);
+            questionDiv.append(questionSelect);
+            questionsDiv.append(questionDiv);
         }
 
         $("#survey").append(questionsDiv);
 
+    </script>
+    <script type="text/javascript">
+        // Chosen CSS
+        var config = {
+            ".chosen-select": {},
+            ".chosen-select-deselect": {
+                allow_single_deselect: true
+            },
+            ".chosen-select-no-single": {
+                disable_search_threshold: 10
+            },
+            ".chosen-select-no-results": {
+                no_results_text: "Oops, nothing found!"
+            },
+            ".chosen-select-width": {
+                width: "95%"
+            }
+        };
+
+        // for (var selector in config) {
+        //     $(selector).chosen(config[selector]);
+        // }
+
+        // Capture the form inputs
+        $("#submit").on("click", function (event) {
+            event.preventDefault();
+
+            // Form validation
+            function validateForm() {
+                var isValid = true;
+                $(".form-control").each(function () {
+                    if ($(this).val() === "") {
+                        isValid = false;
+                    }
+                });
+
+                $(".chosen-select").each(function () {
+
+                    if ($(this).val() === "") {
+                        isValid = false;
+                    }
+                });
+                return isValid;
+            }
+
+            // If all required fields are filled
+            if (validateForm()) {
+                // Create an object for the user"s data
+                var userData = {
+                    name: $("#name").val(),
+                    photo: $("#photo").val(),
+                    scores: [
+                        $("#question0").val(),
+                        $("#question1").val(),
+                        $("#question2").val(),
+                        $("#question3").val(),
+                        $("#question4").val(),
+                        $("#question5").val(),
+                        $("#question6").val(),
+                        $("#question7").val(),
+                        $("#question8").val(),
+                        $("#question9").val()
+                    ]
+                };
+
+                // AJAX post the data to the friends API.
+                $.post("/api/friends", userData, function (data) {
+
+                    // Grab the result from the AJAX post so that the best match's name and photo are displayed.
+                    $("#match-name").text(data.name);
+                    $("#match-img").attr("src", data.photo);
+
+                    // Show the modal with the best match
+                    $("#results-modal").modal("toggle");
+
+                });
+            } else {
+                alert("Please fill out the form in it's entirety!!");
+            }
+        });
     </script>
 </body>
 
